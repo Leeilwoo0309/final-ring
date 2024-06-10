@@ -1,0 +1,15 @@
+.bullet {
+    --bullet-size: 20px;
+
+    position: absolute;
+    height: var(--bullet-size); width: var(--bullet-size);
+    border-radius: 100%;
+}
+
+.enemy.bullet {
+    background-color: rgb(180, 0, 0);
+}
+
+.player.bullet {
+    background-color: rgb(0, 0, 180);
+}

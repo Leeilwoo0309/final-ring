@@ -1,0 +1,50 @@
+.character {
+    --char-size: 40px;
+    background-color: gray;
+    width: var(--char-size);
+    height: var(--char-size);
+    border-radius: 100%;
+
+    position: absolute;
+    /* margin: 0;
+    padding-top: 0; */
+}
+
+.player.character {
+    background-color: blue;
+}
+
+.enemy.character {
+    background-color: red;
+}
+
+.mt {
+    height: 30px;
+}
+
+.hp {
+    width: var(--char-size);
+    height: 10px;
+    background-color: black;
+    margin-top: -60px;
+}
+
+.skill {
+    width: calc(var(--char-size) - 2px);
+    height: 10px;
+    background-color: black;
+    margin-bottom: -40px;
+    border: 1px solid black;
+}
+
+.hp-progress {
+    background-color: yellowgreen;
+    width: 50%;
+    height: 10px;
+}
+
+.skill-progress {
+    background-color: yellow;
+    width: 100%;
+    height: 10px;
+}

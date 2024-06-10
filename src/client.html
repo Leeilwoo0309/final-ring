@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles/global.css">
+    <link rel="stylesheet" href="./styles/charater.css">
+    <link rel="stylesheet" href="./styles/info.css">
+    <link rel="stylesheet" href="./styles/bullet.css">
+    <title>Online</title>
+</head>
+<body>
+    <main role="main">
+        <div class="character player">
+            <div class="mt"></div>
+            <div class="skill player">
+                <div class="skill-progress player"></div>
+            </div>
+            <div class="hp player">
+                <div class="hp-progress player"></div>
+            </div>
+                </div>
+
+        <div class="character enemy">
+            <div class="mt"></div>
+            <div class="skill enemy">
+                <div class="skill-progress enemy"></div>
+            </div>
+            <div class="hp enemy">
+                <div class="hp-progress enemy"></div>
+            </div>
+                </div>
+        <!-- <div class="bullet enemy"></div>
+        <div class="bullet player"></div> -->
+    </main>
+    <footer>
+        <div id="info">
+            <div id="skill-info">
+                <div></div>
+                <div id="dash" class="skill-btn">Dash</div>
+                <div id="r" class="skill-btn">SKill</div>
+            </div>
+            <div id="hp-info">
+                <div id="hp-info-pro"></div>
+                <p id="hp-p">HP: 100/100</p>
+            </div>
+        </div>
+    </footer>
+    
+    <img src="./public/pointer.png" style="height: 25px; position: absolute;" id="cursor" />
+
+    <script src="./js/bullet.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/server.js"></script>
+</body>
+</html>

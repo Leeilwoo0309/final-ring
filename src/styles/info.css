@@ -1,0 +1,48 @@
+#info {
+    grid-template-columns: 40% 60%;
+    display: grid;
+}
+
+#hp-info {
+    position: absolute;
+    left: 650px;
+    bottom: 60px;
+    width: 300px;
+    height: 30px;
+
+    /* border-radius: 10px; */
+    margin: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    background-color: black;
+}
+
+#hp-info-pro {
+    background-color: greenyellow;
+    width: 100%;
+    height: 30px;
+}
+
+#hp-p {
+    margin: 3px;
+    font-family: 'consolas';
+    font-size: 20px;
+}
+
+#skill-info {
+    grid-template-columns: 50% 25% 25%;
+    display: grid;
+    padding-left: 50px;
+    padding-top: 20px;
+}
+
+.skill-btn {
+    height: 80px;
+    width: 80px;
+    background-color: black;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
