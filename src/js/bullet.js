@@ -7,13 +7,19 @@ var Bullet = /** @class */ (function () {
         this.isSent = false;
         this.isColid = false;
         this.damage = damageInit;
+        this.time = -1;
+        this.random = 0;
+        this.dmgToHeal = false;
     }
     Bullet.prototype.setDegree = function (degree) {
         this.degree = degree;
         return this;
     };
-    Bullet.prototype.setDamage = function (damage) {
+    Bullet.prototype.setDamage = function (damage, random) {
         this.damage = damage;
+        if (random) {
+            this.random = random;
+        }
         return this;
     };
     Bullet.prototype.setSpeed = function (spd) {
@@ -23,6 +29,14 @@ var Bullet = /** @class */ (function () {
     Bullet.prototype.setPos = function (x, y) {
         this.pos.x = x;
         this.pos.y = y;
+        return this;
+    };
+    Bullet.prototype.setReach = function (time) {
+        this.time = time;
+        return this;
+    };
+    Bullet.prototype.setExtra = function (extra) {
+        this.dmgToHeal = extra.dmgToHeal;
         return this;
     };
     Bullet.prototype.build = function (type) {
@@ -39,7 +53,20 @@ var Bullet = /** @class */ (function () {
             _bullet.style.top = "".concat(Number(enemy.style.top.replace('px', '')) + 10, "px");
             _bullet.style.left = "".concat(Number(enemy.style.left.replace('px', '')) + 10, "px");
         }
+        if (this.damage == 0) {
+            _bullet.style.opacity = "30%";
+            _bullet.style.backgroundColor = "black";
+        }
         _main.appendChild(_bullet);
+        if (this.time != -1) {
+            setTimeout(function () {
+                if (_this.isArrive) {
+                    clearInterval(interval);
+                    _this.isArrive = false;
+                    _main.removeChild(_bullet);
+                }
+            }, this.time * 1000);
+        }
         var interval = setInterval(function () {
             var bulletX = parseFloat(_bullet.style.left);
             var bulletY = parseFloat(_bullet.style.top);
@@ -53,10 +80,14 @@ var Bullet = /** @class */ (function () {
                 if (Math.abs(_this.pos.x - position.p.x - 12) <= 27 && Math.abs(_this.pos.y - position.p.y - 12) <= 27 && !_this.isColid) {
                     hp.p -= _this.damage;
                     _this.isColid = true;
+                    console.log(_this.dmgToHeal);
+                    if (_this.dmgToHeal) {
+                        socket.send("{\"message\":\"dmgToHeal\"}");
+                    }
                 }
             }
             // 화면 밖으로 나가면 탄환 제거
-            if (newX < 0 || newX > _main.clientWidth || newY < 0 || newY > _main.clientHeight) {
+            if ((newX < 0 || newX > _main.clientWidth || newY < 0 || newY > _main.clientHeight) && _this.isArrive) {
                 clearInterval(interval);
                 _this.isArrive = false;
                 _main.removeChild(_bullet);

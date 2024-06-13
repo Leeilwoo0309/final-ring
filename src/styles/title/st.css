@@ -19,3 +19,16 @@ h1 {
 body {
     user-select: none;
 }
+
+h3 {
+    text-align: center;
+    font-size: 50px;
+}
+
+.win {
+    color: blue;
+}
+
+.lose {
+    color: red;
+}

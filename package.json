@@ -4,12 +4,44 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy": "electron-builder --windows nsis:ia32"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "electron": "^30.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
     "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "electron": "^30.1.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "productName": "이름 못정함ㅠ",
+    "appId": "com.vn.fr",
+    "asar": true,
+    "protocols": {
+      "name": "이름 못정함ㅠ",
+      "schemes": [
+        "이름 못정함ㅠ"
+      ]
+    },
+    "win": {
+      "target": [
+        "zip",
+        "nsis"
+      ],
+      "icon": "./build/icons/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "buildResources": "./resources/installer/",
+      "output": "./dist/",
+      "app": "."
+    }
   }
 }

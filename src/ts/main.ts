@@ -1,10 +1,11 @@
-const socket = new WebSocket("ws://localhost:8000");
+const socket = new WebSocket("ws://211.199.231.47:8000");
 
 const body: HTMLElement = document.body;
 const player: HTMLDivElement = document.querySelector('.character.player');
 const enemy: HTMLDivElement = document.querySelector('.character.enemy');
 const cursor: HTMLImageElement = document.querySelector('#cursor');
-const dash: HTMLDivElement = document.querySelector('#dash');
+const dashBtn: HTMLDivElement = document.querySelector('#dash');
+const skillBtn: HTMLDivElement = document.querySelector('#r');
 const params = new URLSearchParams(window.location.search);
 
 /**
@@ -12,12 +13,47 @@ const params = new URLSearchParams(window.location.search);
  * 1: 기관총
  * 2: 저격소총
  * 3: 샷건
+ * 4: 쌍권총
  */
 const job: number = Number(params.get("job"));
+/**
+ * 0: 돌진
+ * 1: 점멸
+ * 2: 힐
+ */
+const userSkill: number = Number(params.get("uski"));
+const id: number = Number(params.get("id"));
+
+async function clientGetData() {
+    return await fetch("http://localhost:1972/getData")
+        .then(r => r.json())
+}
+
+let fetchedData: JobData;
+clientGetData().then(r => fetchedData = r.data.job[job]);
+
+console.log(fetchedData)
 
 let moveSpeed: number = 8;
-let attackSpeedInit: number = [20, 10, 100, 50][job];
-let damageInit: number = [10, 7, 45, 10][job];
+let attackSpeedInit: number = [15, 10, 100, 50, 10, 5, 40][job]
+let reach: number = [1.2, 1.2, 10, 1, 0.65, 0.5, 2][job];
+let damageInit: number = [10, 7, 45, 10, 5, 4, 20][job];
+let skillCoolTime: number = 20;
+let dmgToHeala: boolean = false;
+
+setTimeout(() => {
+    attackSpeedInit = fetchedData.attackSpd;
+    reach = fetchedData.reach;
+    damageInit = fetchedData.damage;
+    skillCoolTime = fetchedData.ct;
+}, 16)
+
+const userSkillInfo = [
+    {cooltime: 800},
+    {cooltime: 1500},
+    {cooltime: 1300},
+    {cooltime: 1700}
+]
 
 let attackSpeed: number = 0;
 let keyDown: KeyDown = {
@@ -25,14 +61,15 @@ let keyDown: KeyDown = {
     a: false,
     s: false,
     d: false,
-    e: {
+    userSkillKey: {
         isDown: false,
         dashLength: 0,
         cooltime: 0
     },
-    f: {
+    jobSkill: {
         isDown: false,
-        cooltime: 0
+        cooltime: 0,
+        isSkillOn: false
     },
     mouse: false,
 };
@@ -50,6 +87,13 @@ let position = {
 
 let bullets = {p: [], e: []};
 
+if (id == 1) {
+    player.style.top = `350px`;
+    player.style.left = `100px`;
+} else if (id == 2) {
+    player.style.top = '350px';
+    player.style.left = '1450px';
+}
 body.addEventListener('keydown', (e) => {
     if (e.key === 'w') {
         keyDown.w = true;
@@ -59,50 +103,10 @@ body.addEventListener('keydown', (e) => {
         keyDown.s = true;
     } else if (e.key === 'd') {
         keyDown.d = true;
-    } else if (e.key === 'e') {
-        keyDown.e.isDown = true;
-    } else if (e.key == 'f') {
-        if (job == 0) {
-            keyDown.f.cooltime = 2800;
-            moveSpeed = 12;
-
-            const interval = setInterval(() => {
-                if (keyDown.e.cooltime > 401) {
-                    keyDown.e.cooltime = 400;
-                }
-            }, 16);
-
-            setTimeout(() => {
-                moveSpeed = 8;
-                clearInterval(interval);
-            }, 8000);
-
-        } else if (job == 1) {
-            keyDown.f.cooltime = 1500;
-            attackSpeedInit = 5;
-            damageInit = 5;
-
-            setTimeout(() => {
-                attackSpeedInit = 10;
-                damageInit = 7;
-            }, 2000);
-
-        } else if (job == 2) {
-            keyDown.f.cooltime = 1500;
-            const mouseX = parseFloat(cursor.style.left);
-            const mouseY = parseFloat(cursor.style.top);
-
-            const angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX)
-                bullets.p.push(new Bullet().setDegree(angle).setDamage(80).setSpeed(30).build());
-
-        } else if (job == 3) {
-            keyDown.f.cooltime = 2000;
-
-            for (let i = -6; i <= 6; i++) {
-                const angle = i / 2
-                bullets.p.push(new Bullet().setDegree(angle).setDamage(30).build());
-            }
-        }
+    } else if (e.key === 'f') {
+        keyDown.userSkillKey.isDown = true;
+    } else if (e.key == 'e' && keyDown.jobSkill.cooltime == 0) {
+        skill(job);
     }
 
     if (e.key == 'k') {
@@ -119,9 +123,9 @@ body.addEventListener('keyup', (e) => {
         keyDown.s = false;
     } else if (e.key === 'd') {
         keyDown.d = false;
-    } else if (e.key === 'e') {
-        keyDown.e.isDown = false;
-        keyDown.e.dashLength = 0;
+    } else if (e.key === 'f') {
+        keyDown.userSkillKey.isDown = false;
+        keyDown.userSkillKey.dashLength = 0;
     }
 });
 
@@ -137,12 +141,12 @@ body.addEventListener('mousedown', (e) => {
             if (job == 3) {
                 for (let i = -2; i < 3; i++) {
                     const angle = Math.atan2(position.p.y - mouseY + (i * 100), position.p.x - mouseX + (i * 100))
-                    bullets.p.push(new Bullet().setDegree(angle).build());
+                    bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setExtra({dmgToHeal: dmgToHeala}).build());
                 }
             } else {
                 const angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX)
                 keyDown.mouse = true;
-                bullets.p.push(new Bullet().setDegree(angle).build());
+                bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setExtra({dmgToHeal: dmgToHeala}).build());
             }
         }
     }
@@ -193,28 +197,11 @@ setInterval(() => {
         player.style.left = `${ Number(player.style.left.replace('px', '')) + moveSpeed}px`;
     }
 
-    if ((keyDown.e.isDown || keyDown.e.dashLength > 0) && (keyDown.e.cooltime == 0 || keyDown.e.dashLength > 0)) {
-        keyDown.e.cooltime = 800;
-        keyDown.e.dashLength += 1;
-        const mouseX = Number(cursor.style.left.replace('px', ''))
-        const mouseY = Number(cursor.style.top.replace('px', ''))
-
-        const angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX);
-
-        const playerX = parseFloat(player.style.left);
-        const playerY = parseFloat(player.style.top);
-
-        const newX =  -1 * 15 * Math.cos(angle);
-        const newY =  -1 * 15 * Math.sin(angle);
-
-        if (keyDown.e.dashLength <= 10) {
-            player.style.left = `${playerX + newX}px`;
-            player.style.top = `${playerY + newY}px`;
-        }
-        
+    if (keyDown.userSkillKey.isDown) {
+        userDefinedSkill(userSkill);
     }
 
-    if (keyDown.mouse && job == 1) {
+    if (keyDown.mouse && (job == 1)) {
         if (attackSpeed == 0) {
             attackSpeed = attackSpeedInit;
     
@@ -223,8 +210,23 @@ setInterval(() => {
         
             const angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX)
         
-            bullets.p.push(new Bullet().setDegree(angle).setDamage(damageInit).build());
+            bullets.p.push(new Bullet().setDegree(angle).setDamage(damageInit).setReach(reach).setExtra({dmgToHeal: dmgToHeala}).build());
         }
+    } else if (keyDown.mouse && (job == 0 || job == 5) && attackSpeed == 0) {
+        const mouseX = parseFloat(cursor.style.left)
+        const mouseY = parseFloat(cursor.style.top)
+        let angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX);
+
+        if (job == 5 && keyDown.jobSkill.isSkillOn) {
+            const mouseX = parseFloat(cursor.style.left) + Math.random() * 300 - 150;
+            const mouseY = parseFloat(cursor.style.top) + Math.random() * 300 - 150;
+
+            angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX);
+        }
+
+        attackSpeed = attackSpeedInit;
+
+        bullets.p.push(new Bullet().setDegree(angle).setDamage(damageInit).setReach(reach).setExtra({dmgToHeal: dmgToHeala}).build());
     }
 
     const myHp: HTMLDivElement = document.querySelector('.hp-progress.player');
@@ -277,24 +279,38 @@ setInterval(() => {
 
     if (hp.p < 0) {
         hp.p = 0;
+        socket.send(`{"message":"gameover"}`);
+        window.location.href = './result.html?result=lose'
+    } else if (hp.p > 100) {
+        hp.p = 100;
     }
 
 }, 16);
 
 setInterval(() => {
-    if (keyDown.e.cooltime > 0) {
-        dash.innerHTML = `${ Math.floor(keyDown.e.cooltime / 10) / 10 }`
-        dash.style.backgroundColor = 'black';
-        dash.style.color = 'white';
-        keyDown.e.cooltime -= 1;
+    if (keyDown.userSkillKey.cooltime > 0) {
+        dashBtn.innerHTML = `${ Math.floor(keyDown.userSkillKey.cooltime / 10) / 10 }`
+        dashBtn.style.backgroundColor = 'black';
+        dashBtn.style.color = 'white';
+        keyDown.userSkillKey.cooltime -= 1;
     } else {
-        dash.innerHTML = `DASH`;
-        dash.style.backgroundColor = '#00aaff';
-        dash.style.color = 'black';
+        dashBtn.innerHTML = ['DASH', 'FLASH', 'HEAL', 'VAMP'][userSkill] + " (F)";
+        dashBtn.style.backgroundColor = '#00aaff';
+        dashBtn.style.color = 'black';
     }
 
     if (attackSpeed > 0) {
         attackSpeed -= 1;
     }
-}, 10);
 
+    if (keyDown.jobSkill.cooltime > 0) {
+        keyDown.jobSkill.cooltime -= 1;
+        skillBtn.innerHTML = `${ Math.floor(keyDown.jobSkill.cooltime / 10) / 10 }`
+        skillBtn.style.backgroundColor = 'black';
+        skillBtn.style.color = 'white';
+    } else {
+        skillBtn.innerHTML = "SKILL (E)";
+        skillBtn.style.backgroundColor = '#00aaff';
+        skillBtn.style.color = 'black';
+    }
+}, 10);
