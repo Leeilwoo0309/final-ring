@@ -34,19 +34,19 @@ function skill(job: number) {
 
         for (let i = -6; i <= 6; i++) {
             const angle = i / 2
-            bullets.p.push(new Bullet().setDegree(angle).setDamage(30).setExtra({dmgToHeal: dmgToHeala}).build());
+            bullets.p.push(new Bullet().setDegree(angle).setDamage(30).setSpeed(bulletSpd).setExtra({dmgToHeal: dmgToHeala}).build());
         }
     } else if (job == 4) {
 
         let index = 0;
         const interval = setInterval(() => {
-            if (index < 11) {
+            if (index < 16) {
                 attackSpeed = 200;
                 const x = position.e.x;
                 const y = position.e.y;
 
                 const angle = Math.atan2(position.p.y - y, position.p.x - x);
-                bullets.p.push(new Bullet().setDamage(8).setDegree(angle).setReach(0.45).setExtra({dmgToHeal: dmgToHeala}).build());
+                bullets.p.push(new Bullet().setDamage(8).setDegree(angle).setSpeed(bulletSpd).setReach(0.07).setExtra({dmgToHeal: dmgToHeala}).build());
                 
                 index += 1;
             } else {
@@ -57,22 +57,22 @@ function skill(job: number) {
         }, 200);
 
         const decoBullet = setInterval(() => {
-            bullets.p.push(new Bullet().setDamage(0).setDegree(Math.random() * 10).setReach(0.45).setExtra({dmgToHeal: dmgToHeala}).build());
+            bullets.p.push(new Bullet().setDamage(0).setDegree(Math.random() * 10).setSpeed(bulletSpd).setReach(0.07).setExtra({dmgToHeal: dmgToHeala}).build());
         }, 50)
     } else if (job == 5) {
         keyDown.jobSkill.isSkillOn = true;
-        reach = 0.8;
+        reach = 0.08;
 
         setTimeout(() => {
             keyDown.jobSkill.isSkillOn = false;
-            reach = 0.5
+            reach = 0.05
         }, 2500);
     }
 }
 
 function userDefinedSkill(userSkill: number) {
     if (userSkill == 0 && (keyDown.userSkillKey.isDown || keyDown.userSkillKey.dashLength > 0) && (keyDown.userSkillKey.cooltime == 0 || keyDown.userSkillKey.dashLength > 0)) {
-        keyDown.userSkillKey.cooltime = userSkillInfo[userSkill].cooltime;
+        keyDown.userSkillKey.cooltime = userSkillInfo;
         keyDown.userSkillKey.dashLength += 1;
         const mouseX = Number(cursor.style.left.replace('px', ''))
         const mouseY = Number(cursor.style.top.replace('px', ''))
@@ -92,7 +92,7 @@ function userDefinedSkill(userSkill: number) {
     }
     if (keyDown.userSkillKey.cooltime == 0){
         if (userSkill == 1) {
-            keyDown.userSkillKey.cooltime = userSkillInfo[userSkill].cooltime;
+            keyDown.userSkillKey.cooltime = userSkillInfo;
     
             const mouseX = Number(cursor.style.left.replace('px', ''))
             const mouseY = Number(cursor.style.top.replace('px', ''))
@@ -108,11 +108,11 @@ function userDefinedSkill(userSkill: number) {
             player.style.left = `${playerX + newX}px`;
             player.style.top = `${playerY + newY}px`;
         } else if (userSkill == 2) {
-            keyDown.userSkillKey.cooltime = userSkillInfo[userSkill].cooltime;
+            keyDown.userSkillKey.cooltime = userSkillInfo;
 
             hp.p += 20;
         } else if (userSkill == 3) {
-            keyDown.userSkillKey.cooltime = userSkillInfo[userSkill].cooltime;
+            keyDown.userSkillKey.cooltime = userSkillInfo;
             dmgToHeala = true;
 
             setTimeout(() => {

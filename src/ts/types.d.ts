@@ -27,6 +27,12 @@ type JobData = {
     reach: number,
     damage: number,
     attackSpd: number,
+    bulletSpd: number,
     skill: string,
     ct: number
+}
+
+type UserSkillData = {
+    name: string,
+    ct: number,
 }

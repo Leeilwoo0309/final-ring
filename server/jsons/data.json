@@ -2,51 +2,75 @@
     "job": [
         {
             "name": "돌격소총",
-            "reach": 120,
+            "reach": 1.20,
             "damage": 10,
-            "attackSpd": 6.6,
-            "skill": "",
-            "ct": 28
+            "attackSpd": 15,
+            "bulletSpd": 15,
+            "skill": "이동속도가 33% 증가하며 돌진 쿨타임이 50% 감소합니다.",
+            "ct": 2800
         },
         {
             "name": "기관총",
-            "reach": 120,
+            "reach": 1.20,
             "damage": 7,
             "attackSpd": 10,
+            "bulletSpd": 15,
             "skill": "2초간 공격속도 100% 증가하는 대신 대미지 29% 감소",
-            "ct": 15
+            "ct": 1500
         },
         {
             "name": "저격소총",
-            "reach": 1000,
+            "reach": 10.00,
             "damage": 45,
-            "attackSpd": 1,
-            "skill": "45의 공격력을 가진 총 한 발 발사",
-            "ct": 15
+            "attackSpd": 100,
+            "bulletSpd": 25,
+            "skill": "90의 공격력을 가진 총 한 발 발사",
+            "ct": 1500
         },
         {
             "name": "샷건",
-            "reach": 100,
+            "reach": 1.00,
             "damage": 10,
-            "attackSpd": 2,
+            "attackSpd": 50,
+            "bulletSpd": 15,
             "skill": "모든 방향으로 한 발 발사",
-            "ct": 10
+            "ct": 1000
         },
         {
             "name": "쌍권총",
-            "reach": 65,
+            "reach": 0.65,
             "damage": 5,
             "attackSpd": 10,
+            "bulletSpd": 15,
             "skill": "2초간 적에게 8의 대미지를 입히는 총알 난사 (사거리: 45)",
-            "ct": 15
+            "ct": 1500
         },
         {
             "name": "기관단총",
-            "reach": 50,
+            "reach": 0.5,
             "damage": 4,
-            "attackSpd": 20,
+            "attackSpd": 5,
+            "bulletSpd": 15,
             "skill": "2.5초간 사거리 100% 증가, 탄 퍼짐",
-            "ct": 20
+            "ct": 2000
+        }
+    ],
+    "userSkill": [
+        {
+            "name": "DASH",
+            "ct": 800
+        },
+        {
+            "name": "FLASH",
+            "ct": 1500
+        },
+        {
+            "name": "HEAL",
+            "ct": 1300
+        },
+        {
+            "name": "VAMP",
+            "ct": 1700
         }
     ]
 }

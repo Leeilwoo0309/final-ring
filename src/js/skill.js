@@ -29,18 +29,18 @@ function skill(job) {
     else if (job == 3) {
         for (var i = -6; i <= 6; i++) {
             var angle = i / 2;
-            bullets.p.push(new Bullet().setDegree(angle).setDamage(30).setExtra({ dmgToHeal: dmgToHeala }).build());
+            bullets.p.push(new Bullet().setDegree(angle).setDamage(30).setSpeed(bulletSpd).setExtra({ dmgToHeal: dmgToHeala }).build());
         }
     }
     else if (job == 4) {
         var index_1 = 0;
         var interval_2 = setInterval(function () {
-            if (index_1 < 11) {
+            if (index_1 < 16) {
                 attackSpeed = 200;
                 var x = position.e.x;
                 var y = position.e.y;
                 var angle = Math.atan2(position.p.y - y, position.p.x - x);
-                bullets.p.push(new Bullet().setDamage(8).setDegree(angle).setReach(0.45).setExtra({ dmgToHeal: dmgToHeala }).build());
+                bullets.p.push(new Bullet().setDamage(8).setDegree(angle).setSpeed(bulletSpd).setReach(0.07).setExtra({ dmgToHeal: dmgToHeala }).build());
                 index_1 += 1;
             }
             else {
@@ -50,21 +50,21 @@ function skill(job) {
             }
         }, 200);
         var decoBullet_1 = setInterval(function () {
-            bullets.p.push(new Bullet().setDamage(0).setDegree(Math.random() * 10).setReach(0.45).setExtra({ dmgToHeal: dmgToHeala }).build());
+            bullets.p.push(new Bullet().setDamage(0).setDegree(Math.random() * 10).setSpeed(bulletSpd).setReach(0.07).setExtra({ dmgToHeal: dmgToHeala }).build());
         }, 50);
     }
     else if (job == 5) {
         keyDown.jobSkill.isSkillOn = true;
-        reach = 0.8;
+        reach = 0.08;
         setTimeout(function () {
             keyDown.jobSkill.isSkillOn = false;
-            reach = 0.5;
+            reach = 0.05;
         }, 2500);
     }
 }
 function userDefinedSkill(userSkill) {
     if (userSkill == 0 && (keyDown.userSkillKey.isDown || keyDown.userSkillKey.dashLength > 0) && (keyDown.userSkillKey.cooltime == 0 || keyDown.userSkillKey.dashLength > 0)) {
-        keyDown.userSkillKey.cooltime = userSkillInfo[userSkill].cooltime;
+        keyDown.userSkillKey.cooltime = userSkillInfo;
         keyDown.userSkillKey.dashLength += 1;
         var mouseX = Number(cursor.style.left.replace('px', ''));
         var mouseY = Number(cursor.style.top.replace('px', ''));
@@ -80,7 +80,7 @@ function userDefinedSkill(userSkill) {
     }
     if (keyDown.userSkillKey.cooltime == 0) {
         if (userSkill == 1) {
-            keyDown.userSkillKey.cooltime = userSkillInfo[userSkill].cooltime;
+            keyDown.userSkillKey.cooltime = userSkillInfo;
             var mouseX = Number(cursor.style.left.replace('px', ''));
             var mouseY = Number(cursor.style.top.replace('px', ''));
             var angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX);
@@ -92,11 +92,11 @@ function userDefinedSkill(userSkill) {
             player.style.top = "".concat(playerY + newY, "px");
         }
         else if (userSkill == 2) {
-            keyDown.userSkillKey.cooltime = userSkillInfo[userSkill].cooltime;
+            keyDown.userSkillKey.cooltime = userSkillInfo;
             hp.p += 20;
         }
         else if (userSkill == 3) {
-            keyDown.userSkillKey.cooltime = userSkillInfo[userSkill].cooltime;
+            keyDown.userSkillKey.cooltime = userSkillInfo;
             dmgToHeala = true;
             setTimeout(function () {
                 dmgToHeala = false;

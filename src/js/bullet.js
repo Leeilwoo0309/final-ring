@@ -3,11 +3,12 @@ var Bullet = /** @class */ (function () {
         this.degree = 0;
         this.pos = { x: 0, y: 0 };
         this.speed = 15;
+        this._movedDistance = 0;
         this.isArrive = true;
         this.isSent = false;
         this.isColid = false;
         this.damage = damageInit;
-        this.time = -1;
+        this.reach = -1;
         this.random = 0;
         this.dmgToHeal = false;
     }
@@ -32,7 +33,7 @@ var Bullet = /** @class */ (function () {
         return this;
     };
     Bullet.prototype.setReach = function (time) {
-        this.time = time;
+        this.reach = time;
         return this;
     };
     Bullet.prototype.setExtra = function (extra) {
@@ -58,16 +59,17 @@ var Bullet = /** @class */ (function () {
             _bullet.style.backgroundColor = "black";
         }
         _main.appendChild(_bullet);
-        if (this.time != -1) {
-            setTimeout(function () {
-                if (_this.isArrive) {
-                    clearInterval(interval);
-                    _this.isArrive = false;
-                    _main.removeChild(_bullet);
-                }
-            }, this.time * 1000);
-        }
+        // if (this.time != -1) {
+        //     setTimeout(() => {
+        //         if (this.isArrive) {
+        //             clearInterval(interval);
+        //             this.isArrive = false;
+        //             _main.removeChild(_bullet);
+        //         }
+        //     }, this.time * 1000)
+        // }
         var interval = setInterval(function () {
+            _this._movedDistance += _this.speed;
             var bulletX = parseFloat(_bullet.style.left);
             var bulletY = parseFloat(_bullet.style.top);
             var newX = bulletX - _this.speed * Math.cos(_this.degree);
@@ -88,6 +90,11 @@ var Bullet = /** @class */ (function () {
             }
             // 화면 밖으로 나가면 탄환 제거
             if ((newX < 0 || newX > _main.clientWidth || newY < 0 || newY > _main.clientHeight) && _this.isArrive) {
+                clearInterval(interval);
+                _this.isArrive = false;
+                _main.removeChild(_bullet);
+            }
+            if (_this._movedDistance >= _this.reach * 8000) {
                 clearInterval(interval);
                 _this.isArrive = false;
                 _main.removeChild(_bullet);

@@ -11,10 +11,11 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "ws": "^8.17.0"
+    "npx": "^10.2.2",
+    "ws": "^8.17.0",
+    "electron": "^30.1.0"
   },
   "devDependencies": {
-    "electron": "^30.1.0"
   },
   "build": {
     "productName": "이름 못정함ㅠ",

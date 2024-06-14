@@ -68,27 +68,30 @@ function clientGetData() {
         });
     });
 }
-var fetchedData;
-clientGetData().then(function (r) { return fetchedData = r.data.job[job]; });
-console.log(fetchedData);
+var fetchedJobData;
+var fetchedUserSkillData;
+clientGetData().then(function (r) {
+    fetchedJobData = r.data.job[job];
+    fetchedUserSkillData = r.data.userSkill[userSkill];
+});
 var moveSpeed = 8;
 var attackSpeedInit = [15, 10, 100, 50, 10, 5, 40][job];
 var reach = [1.2, 1.2, 10, 1, 0.65, 0.5, 2][job];
 var damageInit = [10, 7, 45, 10, 5, 4, 20][job];
+var bulletSpd = [15, 15, 15, 15, 15, 15][job];
 var skillCoolTime = 20;
 var dmgToHeala = false;
+var userSkillInfo;
+var userSkillname;
 setTimeout(function () {
-    attackSpeedInit = fetchedData.attackSpd;
-    reach = fetchedData.reach;
-    damageInit = fetchedData.damage;
-    skillCoolTime = fetchedData.ct;
+    attackSpeedInit = fetchedJobData.attackSpd;
+    reach = fetchedJobData.reach / 10;
+    damageInit = fetchedJobData.damage;
+    skillCoolTime = fetchedJobData.ct / 100;
+    bulletSpd = fetchedJobData.bulletSpd;
+    userSkillInfo = fetchedUserSkillData.ct;
+    userSkillname = fetchedUserSkillData.name;
 }, 16);
-var userSkillInfo = [
-    { cooltime: 800 },
-    { cooltime: 1500 },
-    { cooltime: 1300 },
-    { cooltime: 1700 }
-];
 var attackSpeed = 0;
 var keyDown = {
     w: false,
@@ -175,13 +178,13 @@ body.addEventListener('mousedown', function (e) {
             if (job == 3) {
                 for (var i = -2; i < 3; i++) {
                     var angle = Math.atan2(position.p.y - mouseY + (i * 100), position.p.x - mouseX + (i * 100));
-                    bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setExtra({ dmgToHeal: dmgToHeala }).build());
+                    bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setSpeed(bulletSpd).setExtra({ dmgToHeal: dmgToHeala }).build());
                 }
             }
             else {
                 var angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX);
                 keyDown.mouse = true;
-                bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setExtra({ dmgToHeal: dmgToHeala }).build());
+                bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setSpeed(bulletSpd).setExtra({ dmgToHeal: dmgToHeala }).build());
             }
         }
     }
@@ -239,7 +242,7 @@ setInterval(function () {
             var mouseX = parseFloat(cursor.style.left) + Math.random() * 400 - 200;
             var mouseY = parseFloat(cursor.style.top) + Math.random() * 400 - 200;
             var angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX);
-            bullets.p.push(new Bullet().setDegree(angle).setDamage(damageInit).setReach(reach).setExtra({ dmgToHeal: dmgToHeala }).build());
+            bullets.p.push(new Bullet().setDegree(angle).setDamage(damageInit).setReach(reach).setSpeed(bulletSpd).setExtra({ dmgToHeal: dmgToHeala }).build());
         }
     }
     else if (keyDown.mouse && (job == 0 || job == 5) && attackSpeed == 0) {
@@ -252,7 +255,7 @@ setInterval(function () {
             angle = Math.atan2(position.p.y - mouseY_1, position.p.x - mouseX_1);
         }
         attackSpeed = attackSpeedInit;
-        bullets.p.push(new Bullet().setDegree(angle).setDamage(damageInit).setReach(reach).setExtra({ dmgToHeal: dmgToHeala }).build());
+        bullets.p.push(new Bullet().setDegree(angle).setDamage(damageInit).setReach(reach).setSpeed(bulletSpd).setExtra({ dmgToHeal: dmgToHeala }).build());
     }
     var myHp = document.querySelector('.hp-progress.player');
     var enemyHp = document.querySelector('.hp-progress.enemy');
@@ -312,7 +315,7 @@ setInterval(function () {
         keyDown.userSkillKey.cooltime -= 1;
     }
     else {
-        dashBtn.innerHTML = ['DASH', 'FLASH', 'HEAL', 'VAMP'][userSkill] + " (F)";
+        dashBtn.innerHTML = userSkillname + " (F)";
         dashBtn.style.backgroundColor = '#00aaff';
         dashBtn.style.color = 'black';
     }

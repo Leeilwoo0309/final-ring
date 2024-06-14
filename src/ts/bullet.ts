@@ -2,11 +2,12 @@ class Bullet {
     public degree: number = 0;
     public pos: {x: number, y:  number} = {x: 0, y: 0};
     private speed: number = 15;
+    private _movedDistance: number = 0;
     public isArrive: boolean = true;
     public isSent: boolean = false;
     public isColid: boolean = false;
     public damage: number = damageInit;
-    public time: number = -1;
+    public reach: number = -1;
     public random: number = 0;
     public dmgToHeal: boolean = false;
 
@@ -37,7 +38,7 @@ class Bullet {
     }
 
     public setReach(time: number): Bullet {
-        this.time = time;
+        this.reach = time;
         return this;
     }
 
@@ -68,18 +69,19 @@ class Bullet {
         
         _main.appendChild(_bullet);
 
-        if (this.time != -1) {
-            setTimeout(() => {
-                if (this.isArrive) {
-                    clearInterval(interval);
-                    this.isArrive = false;
-                    _main.removeChild(_bullet);
-                }
+        // if (this.time != -1) {
+        //     setTimeout(() => {
+        //         if (this.isArrive) {
+        //             clearInterval(interval);
+        //             this.isArrive = false;
+        //             _main.removeChild(_bullet);
+        //         }
 
-            }, this.time * 1000)
-        }
+        //     }, this.time * 1000)
+        // }
 
         const interval = setInterval(() => {
+            this._movedDistance += this.speed;
             const bulletX = parseFloat(_bullet.style.left);
             const bulletY = parseFloat(_bullet.style.top);
 
@@ -110,7 +112,13 @@ class Bullet {
                 this.isArrive = false;
                 _main.removeChild(_bullet);
             }
-            }, 16);
+
+            if (this._movedDistance >= this.reach * 8000) {
+                clearInterval(interval);
+                this.isArrive = false;
+                _main.removeChild(_bullet);
+            }
+        }, 16);
 
         // clearInterval(interval);
 

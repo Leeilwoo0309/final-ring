@@ -29,31 +29,33 @@ async function clientGetData() {
         .then(r => r.json())
 }
 
-let fetchedData: JobData;
-clientGetData().then(r => fetchedData = r.data.job[job]);
-
-console.log(fetchedData)
+let fetchedJobData: JobData;
+let fetchedUserSkillData: UserSkillData;
+clientGetData().then(r => {
+    fetchedJobData = r.data.job[job]
+    fetchedUserSkillData = r.data.userSkill[userSkill]
+});
 
 let moveSpeed: number = 8;
 let attackSpeedInit: number = [15, 10, 100, 50, 10, 5, 40][job]
 let reach: number = [1.2, 1.2, 10, 1, 0.65, 0.5, 2][job];
 let damageInit: number = [10, 7, 45, 10, 5, 4, 20][job];
+let bulletSpd: number = [15, 15, 15, 15, 15, 15][job];
 let skillCoolTime: number = 20;
 let dmgToHeala: boolean = false;
+let userSkillInfo: number;
+let userSkillname: string;
 
 setTimeout(() => {
-    attackSpeedInit = fetchedData.attackSpd;
-    reach = fetchedData.reach;
-    damageInit = fetchedData.damage;
-    skillCoolTime = fetchedData.ct;
-}, 16)
+    attackSpeedInit = fetchedJobData.attackSpd;
+    reach = fetchedJobData.reach / 10;
+    damageInit = fetchedJobData.damage;
+    skillCoolTime = fetchedJobData.ct / 100;
+    bulletSpd = fetchedJobData.bulletSpd;
 
-const userSkillInfo = [
-    {cooltime: 800},
-    {cooltime: 1500},
-    {cooltime: 1300},
-    {cooltime: 1700}
-]
+    userSkillInfo = fetchedUserSkillData.ct;
+    userSkillname = fetchedUserSkillData.name;
+}, 16);
 
 let attackSpeed: number = 0;
 let keyDown: KeyDown = {
@@ -141,12 +143,12 @@ body.addEventListener('mousedown', (e) => {
             if (job == 3) {
                 for (let i = -2; i < 3; i++) {
                     const angle = Math.atan2(position.p.y - mouseY + (i * 100), position.p.x - mouseX + (i * 100))
-                    bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setExtra({dmgToHeal: dmgToHeala}).build());
+                    bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setSpeed(bulletSpd).setExtra({dmgToHeal: dmgToHeala}).build());
                 }
             } else {
                 const angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX)
                 keyDown.mouse = true;
-                bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setExtra({dmgToHeal: dmgToHeala}).build());
+                bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setSpeed(bulletSpd).setExtra({dmgToHeal: dmgToHeala}).build());
             }
         }
     }
@@ -210,7 +212,7 @@ setInterval(() => {
         
             const angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX)
         
-            bullets.p.push(new Bullet().setDegree(angle).setDamage(damageInit).setReach(reach).setExtra({dmgToHeal: dmgToHeala}).build());
+            bullets.p.push(new Bullet().setDegree(angle).setDamage(damageInit).setReach(reach).setSpeed(bulletSpd).setExtra({dmgToHeal: dmgToHeala}).build());
         }
     } else if (keyDown.mouse && (job == 0 || job == 5) && attackSpeed == 0) {
         const mouseX = parseFloat(cursor.style.left)
@@ -226,7 +228,7 @@ setInterval(() => {
 
         attackSpeed = attackSpeedInit;
 
-        bullets.p.push(new Bullet().setDegree(angle).setDamage(damageInit).setReach(reach).setExtra({dmgToHeal: dmgToHeala}).build());
+        bullets.p.push(new Bullet().setDegree(angle).setDamage(damageInit).setReach(reach).setSpeed(bulletSpd).setExtra({dmgToHeal: dmgToHeala}).build());
     }
 
     const myHp: HTMLDivElement = document.querySelector('.hp-progress.player');
@@ -294,7 +296,7 @@ setInterval(() => {
         dashBtn.style.color = 'white';
         keyDown.userSkillKey.cooltime -= 1;
     } else {
-        dashBtn.innerHTML = ['DASH', 'FLASH', 'HEAL', 'VAMP'][userSkill] + " (F)";
+        dashBtn.innerHTML = userSkillname + " (F)";
         dashBtn.style.backgroundColor = '#00aaff';
         dashBtn.style.color = 'black';
     }

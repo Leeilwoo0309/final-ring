@@ -19,6 +19,7 @@ socket.onopen = () => {
                         .setDamage(e.damage)
                         .setPos(e.pos.x, e.pos.y)
                         .setReach(e.time)
+                        .setSpeed(e.speed)
                         .setExtra({dmgToHeal: e.dmgToHeal})
                         .build('enemy');
                     });
