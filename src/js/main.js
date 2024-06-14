@@ -34,7 +34,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var socket = new WebSocket("ws://211.199.231.47:8000");
+var socket = new WebSocket("ws://10.7.152.216:8000");
 var body = document.body;
 var player = document.querySelector('.character.player');
 var enemy = document.querySelector('.character.enemy');

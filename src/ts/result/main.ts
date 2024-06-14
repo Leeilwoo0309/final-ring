@@ -2,7 +2,7 @@ const resultParams = new URLSearchParams(window.location.search);
 const resultH3: HTMLHeadingElement = document.querySelector('h3');
 const homeBtn: HTMLDivElement = document.querySelector('#go-home');
 const result: string = resultParams.get("result");
-const resultSocket = new WebSocket("ws://localhost:8000");
+const resultSocket = new WebSocket("ws://10.7.152.216:8000");
 
 if (result == 'lose') {
     resultH3.innerHTML = "패배";

@@ -1,4 +1,4 @@
-const _socket = new WebSocket("ws://localhost:8000");
+const _socket = new WebSocket("ws://10.7.152.216:8000");
 const startBtn = document.querySelector('#start-btn');
 const classSelect: NodeListOf<HTMLDivElement> = document.querySelectorAll('.job-btn');
 const skillSelect: NodeListOf<HTMLDivElement> = document.querySelectorAll('.skill-btn');
@@ -9,7 +9,7 @@ let _job: number = 0;
 let _ski: number = 0;
 
 async function getData() {
-    const res =  await fetch("http://localhost:1972/getData")
+    const res =  await fetch("http://10.7.152.216:1972/getData")
     return res.json();
 }
 

@@ -1,4 +1,4 @@
-const socket = new WebSocket("ws://211.199.231.47:8000");
+const socket = new WebSocket("ws://10.7.152.216:8000");
 
 const body: HTMLElement = document.body;
 const player: HTMLDivElement = document.querySelector('.character.player');

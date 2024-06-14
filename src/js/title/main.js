@@ -34,7 +34,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _socket = new WebSocket("ws://localhost:8000");
+var _socket = new WebSocket("ws://10.7.152.216:8000");
 var startBtn = document.querySelector('#start-btn');
 var classSelect = document.querySelectorAll('.job-btn');
 var skillSelect = document.querySelectorAll('.skill-btn');
@@ -47,7 +47,7 @@ function getData() {
         var res;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch("http://localhost:1972/getData")];
+                case 0: return [4 /*yield*/, fetch("http://10.7.152.216:1972/getData")];
                 case 1:
                     res = _a.sent();
                     return [2 /*return*/, res.json()];
