@@ -13,6 +13,11 @@ type KeyDown = {
         cooltime: number,
         isSkillOn: boolean
     },
+    jobSkill2: {
+        isDown: boolean,
+        cooltime: number,
+        isSkillOn: boolean
+    },
     mouse: boolean,
 };
 
@@ -28,8 +33,19 @@ type JobData = {
     damage: number,
     attackSpd: number,
     bulletSpd: number,
-    skill: string,
-    ct: number
+    skill: SkillData[]
+}
+
+type SkillData = {
+    des: string,
+    ct: number,
+    reach: number,
+    damage: number,
+    attackSpd: number,
+    bulletSpd: number,
+    moveSpd: number,
+    extraData: number,
+    skillDuration: number
 }
 
 type UserSkillData = {

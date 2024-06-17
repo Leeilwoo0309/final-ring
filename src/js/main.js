@@ -34,14 +34,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var socket = new WebSocket("ws://10.7.152.216:8000");
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
+var socket = new WebSocket("ws:/kimchi-game.kro.kr:8000");
 var body = document.body;
 var player = document.querySelector('.character.player');
 var enemy = document.querySelector('.character.enemy');
 var cursor = document.querySelector('#cursor');
 var dashBtn = document.querySelector('#dash');
 var skillBtn = document.querySelector('#r');
+var secondSkillBtn = document.querySelector('#r2');
 var params = new URLSearchParams(window.location.search);
+var readyStatus = { p: false, e: false };
 /**
  * 0: 돌격소총
  * 1: 기관총
@@ -50,6 +61,7 @@ var params = new URLSearchParams(window.location.search);
  * 4: 쌍권총
  */
 var job = Number(params.get("job"));
+var enemyJob;
 /**
  * 0: 돌진
  * 1: 점멸
@@ -61,7 +73,7 @@ function clientGetData() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, fetch("http://localhost:1972/getData")
+                case 0: return [4 /*yield*/, fetch("http://kimchi-game.kro.kr:1972/getData")
                         .then(function (r) { return r.json(); })];
                 case 1: return [2 /*return*/, _a.sent()];
             }
@@ -69,10 +81,23 @@ function clientGetData() {
     });
 }
 var fetchedJobData;
+var fetchedAllJobData;
 var fetchedUserSkillData;
+var skillData;
+var allSkillData = [];
 clientGetData().then(function (r) {
-    fetchedJobData = r.data.job[job];
-    fetchedUserSkillData = r.data.userSkill[userSkill];
+    try {
+        fetchedJobData = r.data.job[job];
+        fetchedAllJobData = r.data.job;
+        fetchedUserSkillData = r.data.userSkill[userSkill];
+        skillData = r.data.job[job].skill;
+        document.querySelector("#loading").innerHTML = "상대방 기다리는 중..";
+        r.data.job.forEach(function (e) {
+            allSkillData.push(e.skill);
+        });
+    }
+    catch (err) {
+    }
 });
 var moveSpeed = 8;
 var attackSpeedInit = [15, 10, 100, 50, 10, 5, 40][job];
@@ -83,14 +108,20 @@ var skillCoolTime = 20;
 var dmgToHeala = false;
 var userSkillInfo;
 var userSkillname;
-setTimeout(function () {
+var getVariable = setInterval(function () {
     attackSpeedInit = fetchedJobData.attackSpd;
     reach = fetchedJobData.reach / 10;
     damageInit = fetchedJobData.damage;
-    skillCoolTime = fetchedJobData.ct / 100;
+    skillCoolTime = fetchedJobData.skill[0].ct / 100;
     bulletSpd = fetchedJobData.bulletSpd;
     userSkillInfo = fetchedUserSkillData.ct;
     userSkillname = fetchedUserSkillData.name;
+    if (readyStatus.p = true) {
+        clearInterval(getVariable);
+        socket.send("{\"message\":\"ready\"}");
+        readyStatus.p = true;
+    }
+    ;
 }, 16);
 var attackSpeed = 0;
 var keyDown = {
@@ -104,6 +135,11 @@ var keyDown = {
         cooltime: 0
     },
     jobSkill: {
+        isDown: false,
+        cooltime: 0,
+        isSkillOn: false
+    },
+    jobSkill2: {
         isDown: false,
         cooltime: 0,
         isSkillOn: false
@@ -128,27 +164,40 @@ else if (id == 2) {
     player.style.top = '350px';
     player.style.left = '1450px';
 }
+if (id == 2) {
+    setTimeout(function () {
+        fetch("http://kimchi-game.kro.kr:1972/statistics/init?job=".concat(job, "&userskill=").concat(userSkill));
+    }, 500);
+}
+else {
+    fetch("http://kimchi-game.kro.kr:1972/statistics/init?job=".concat(job, "&userskill=").concat(userSkill));
+}
 body.addEventListener('keydown', function (e) {
-    if (e.key === 'w') {
-        keyDown.w = true;
-    }
-    else if (e.key === 'a') {
-        keyDown.a = true;
-    }
-    else if (e.key === 's') {
-        keyDown.s = true;
-    }
-    else if (e.key === 'd') {
-        keyDown.d = true;
-    }
-    else if (e.key === 'f') {
-        keyDown.userSkillKey.isDown = true;
-    }
-    else if (e.key == 'e' && keyDown.jobSkill.cooltime == 0) {
-        skill(job);
-    }
-    if (e.key == 'k') {
-        hp.p = 100;
+    if (readyStatus.p && readyStatus.e) {
+        if (e.key === 'w') {
+            keyDown.w = true;
+        }
+        else if (e.key === 'a') {
+            keyDown.a = true;
+        }
+        else if (e.key === 's') {
+            keyDown.s = true;
+        }
+        else if (e.key === 'd') {
+            keyDown.d = true;
+        }
+        else if (e.key === 'f') {
+            keyDown.userSkillKey.isDown = true;
+        }
+        else if (e.key == 'e' && keyDown.jobSkill.cooltime == 0) {
+            skill(job, skillData[0]);
+        }
+        else if (e.key == 'q' && keyDown.jobSkill2.cooltime == 0) {
+            skill2(job, skillData[1]);
+        }
+        if (e.key == 'k') {
+            hp.p = 100;
+        }
     }
 });
 body.addEventListener('keyup', function (e) {
@@ -170,21 +219,23 @@ body.addEventListener('keyup', function (e) {
     }
 });
 body.addEventListener('mousedown', function (e) {
-    if (attackSpeed == 0) {
-        attackSpeed = attackSpeedInit;
-        var mouseX = e.clientX;
-        var mouseY = e.clientY - 10;
-        if (e.button === 0) {
-            if (job == 3) {
-                for (var i = -2; i < 3; i++) {
-                    var angle = Math.atan2(position.p.y - mouseY + (i * 100), position.p.x - mouseX + (i * 100));
+    if (readyStatus.p && readyStatus.e) {
+        if (attackSpeed == 0) {
+            attackSpeed = attackSpeedInit;
+            var mouseX = e.clientX;
+            var mouseY = e.clientY - 10;
+            if (e.button === 0) {
+                if (job == 3) {
+                    for (var i = -2; i < 3; i++) {
+                        var angle = Math.atan2(position.p.y - mouseY + (i * 100), position.p.x - mouseX + (i * 100));
+                        bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setSpeed(bulletSpd).setExtra({ dmgToHeal: dmgToHeala }).build());
+                    }
+                }
+                else {
+                    var angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX);
+                    keyDown.mouse = true;
                     bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setSpeed(bulletSpd).setExtra({ dmgToHeal: dmgToHeala }).build());
                 }
-            }
-            else {
-                var angle = Math.atan2(position.p.y - mouseY, position.p.x - mouseX);
-                keyDown.mouse = true;
-                bullets.p.push(new Bullet().setDegree(angle).setReach(reach).setSpeed(bulletSpd).setExtra({ dmgToHeal: dmgToHeala }).build());
             }
         }
     }
@@ -257,16 +308,23 @@ setInterval(function () {
         attackSpeed = attackSpeedInit;
         bullets.p.push(new Bullet().setDegree(angle).setDamage(damageInit).setReach(reach).setSpeed(bulletSpd).setExtra({ dmgToHeal: dmgToHeala }).build());
     }
-    var myHp = document.querySelector('.hp-progress.player');
+    var playerHp = document.querySelector('.hp-progress.player');
     var enemyHp = document.querySelector('.hp-progress.enemy');
     var hpInfo = document.querySelector('#hp-info-pro');
     var hpPInfo = document.querySelector('#hp-p');
-    myHp.style.width = "".concat(hp.p, "%");
+    playerHp.style.width = "".concat(hp.p, "%");
     enemyHp.style.width = "".concat(hp.e, "%");
     hpInfo.style.width = "".concat(hp.p, "%");
     hpPInfo.innerHTML = "HP: ".concat(hp.p, " / 100");
     position.p.x = Number(player.style.left.replace('px', ''));
     position.p.y = Number(player.style.top.replace('px', ''));
+    var newBullet = { p: [], e: [] };
+    bullets.p.forEach(function (e) {
+        if (e.isArrive) {
+            newBullet.p.push(e);
+        }
+    });
+    bullets.p = __spreadArray([], newBullet.p, true);
     var resJson = {
         hp: hp,
         position: position,
@@ -294,6 +352,8 @@ setInterval(function () {
             hp.p += 1;
         extraHp = 0;
     }
+    if (enemyJob == undefined)
+        socket.send("{\"message\": \"getJob\"}");
     socket.send(JSON.stringify(resJson));
     bullets.p.forEach(function (e) {
         e.isSent = true;
@@ -301,13 +361,21 @@ setInterval(function () {
     if (hp.p < 0) {
         hp.p = 0;
         socket.send("{\"message\":\"gameover\"}");
-        window.location.href = './result.html?result=lose';
+        window.location.href = "./result.html?result=lose&job=".concat(job, "&userskill=").concat(userSkill);
     }
     else if (hp.p > 100) {
         hp.p = 100;
     }
 }, 16);
 setInterval(function () {
+    if (readyStatus.e && readyStatus.p) {
+        document.querySelector("#loading").innerHTML = "\uC0C1\uB300: ".concat(fetchedAllJobData[enemyJob].name);
+        //@ts-ignore
+        document.querySelector("#loading").style.color = "rgb(200, 200, 200)";
+    }
+    else if (readyStatus.p && !readyStatus.e) {
+        socket.send("{\"message\":\"ready\"}");
+    }
     if (keyDown.userSkillKey.cooltime > 0) {
         dashBtn.innerHTML = "".concat(Math.floor(keyDown.userSkillKey.cooltime / 10) / 10);
         dashBtn.style.backgroundColor = 'black';
@@ -327,10 +395,29 @@ setInterval(function () {
         skillBtn.innerHTML = "".concat(Math.floor(keyDown.jobSkill.cooltime / 10) / 10);
         skillBtn.style.backgroundColor = 'black';
         skillBtn.style.color = 'white';
+        if (keyDown.jobSkill.isSkillOn == true) {
+            skillBtn.style.backgroundColor = 'yellow';
+            skillBtn.style.color = 'black';
+        }
     }
     else {
-        skillBtn.innerHTML = "SKILL (E)";
+        skillBtn.innerHTML = "SKILL 1 <br/> (E)";
         skillBtn.style.backgroundColor = '#00aaff';
         skillBtn.style.color = 'black';
+    }
+    if (keyDown.jobSkill2.cooltime > 0) {
+        keyDown.jobSkill2.cooltime -= 1;
+        secondSkillBtn.innerHTML = "".concat(Math.floor(keyDown.jobSkill2.cooltime / 10) / 10);
+        secondSkillBtn.style.backgroundColor = 'black';
+        secondSkillBtn.style.color = 'white';
+        if (keyDown.jobSkill2.isSkillOn == true) {
+            secondSkillBtn.style.backgroundColor = 'yellow';
+            secondSkillBtn.style.color = 'black';
+        }
+    }
+    else {
+        secondSkillBtn.innerHTML = "SKILL 2 <br/> (Q)";
+        secondSkillBtn.style.backgroundColor = '#00aaff';
+        secondSkillBtn.style.color = 'black';
     }
 }, 10);

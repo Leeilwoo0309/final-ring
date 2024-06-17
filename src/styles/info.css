@@ -31,7 +31,7 @@
 }
 
 #skill-info {
-    grid-template-columns: 50% 25% 25%;
+    grid-template-columns: 40% 20% 20% 20%;
     display: grid;
     padding-left: 50px;
     padding-top: 20px;

@@ -55,7 +55,7 @@ var Bullet = /** @class */ (function () {
             _bullet.style.left = "".concat(Number(enemy.style.left.replace('px', '')) + 10, "px");
         }
         if (this.damage == 0) {
-            _bullet.style.opacity = "30%";
+            _bullet.style.opacity = "20%";
             _bullet.style.backgroundColor = "black";
         }
         _main.appendChild(_bullet);
@@ -79,10 +79,23 @@ var Bullet = /** @class */ (function () {
             _this.pos.x = newX;
             _this.pos.y = newY;
             if (type == "enemy") {
-                if (Math.abs(_this.pos.x - position.p.x - 12) <= 27 && Math.abs(_this.pos.y - position.p.y - 12) <= 27 && !_this.isColid) {
-                    hp.p -= _this.damage;
+                // if (Math.abs(this.pos.x - position.p.x - 12) <= 27 && Math.abs(this.pos.y - position.p.y - 12) <= 27 && !this.isColid) {
+                if (Math.abs(newX - position.p.x - 10) <= 30 && Math.abs(newY - position.p.y - 10) <= 30 && !_this.isColid) {
+                    //                             ^^ 있는 이유: 총알의 반지름
+                    if (job == 0 && keyDown.jobSkill2.isSkillOn) {
+                        hp.p -= Math.floor(_this.damage * (skillData[1].extraData * 0.01));
+                    }
+                    else {
+                        hp.p -= _this.damage;
+                    }
+                    if (enemyJob == 1) {
+                        moveSpeed = allSkillData[1][1].moveSpd;
+                        setTimeout(function () {
+                            moveSpeed = 8;
+                        }, allSkillData[1][1].skillDuration * 10);
+                    }
                     _this.isColid = true;
-                    console.log(_this.dmgToHeal);
+                    _this.isArrive = false;
                     if (_this.dmgToHeal) {
                         socket.send("{\"message\":\"dmgToHeal\"}");
                     }

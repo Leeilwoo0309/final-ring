@@ -1,4 +1,13 @@
 #info {
     margin-top: auto;
     margin-bottom: auto;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 10px;
+    height: max-content;
+}
+
+#info>p>p {
+    font-size: 18px;
+    padding-bottom: 0px;
 }

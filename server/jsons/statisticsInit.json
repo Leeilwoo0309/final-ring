@@ -1,0 +1,67 @@
+{
+    "games":0,
+    "job":[
+        {
+            "id": 0,
+            "win":0,
+            "lose":0,
+            "pick":0
+        },
+        {
+            "id": 1,
+            "win":0,
+            "lose":0,
+            "pick":0
+        },
+        {
+            "id": 2,
+            "win":0,
+            "lose":0,
+            "pick":0
+        },
+        {
+            "id": 3,
+            "win":0,
+            "lose":0,
+            "pick":0
+        },
+        {
+            "id": 4,
+            "win":0,
+            "lose":0,
+            "pick":0
+        },
+        {
+            "id": 5,
+            "win":0,
+            "lose":0,
+            "pick":0
+        }
+    ],
+    "userSkill":[
+        {
+            "id": 0,
+            "win":0,
+            "lose":0,
+            "pick":0
+        },
+        {
+            "id": 1,
+            "win":0,
+            "lose":0,
+            "pick":0
+        },
+        {
+            "id": 2,
+            "win":0,
+            "lose":0,
+            "pick":0
+        },
+        {
+            "id": 3,
+            "win":0,
+            "lose":0,
+            "pick":0
+        }
+    ]
+}

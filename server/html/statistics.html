@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        div {
+            display: flex;
+            align-items: center;
+        }
+
+        div>h1 { margin-right: 40px;}
+    </style>
+    <title>통계</title>
+</head>
+<body>
+    <header>
+        <button class="btn">승률 순</button>
+        <button class="btn">픽률 순</button>
+        <button class="btn">최다 승</button>
+        <button class="btn">최다 패</button>
+        <button class="btn">최다 픽</button>
+    </header>
+    <main role="main">
+    </main>
+
+    <script>
+        let data, allData, nowStatus = 0;
+        const main = document.querySelector('main');
+
+        async function getData() {
+            return await fetch(`http://kimchi-game.kro.kr:1972/statistics/get`).then(r => r.json());
+        }
+        async function getOriginalData() {
+            return await fetch(`http://kimchi-game.kro.kr:1972/getData`).then(r => r.json());
+        }
+
+        getData().then(r => {
+            data = r;
+        });
+
+        getOriginalData().then(r => {
+            allData = r;
+        });
+
+        document.querySelectorAll('.btn').forEach((e, i) => {
+            e.addEventListener('click', () => {
+                nowStatus = i;
+            })
+        })
+        
+        const update = setInterval(() => {
+            updatePage(data.job, data.userSkill)
+        }, 16);
+
+        function updatePage(job, userSkill) {
+            main.innerHTML = '';
+            let jobSt = [], userSkillSt = [];
+
+            if (nowStatus == 0) job.sort((x, y) => (Math.floor(y.win * 100 / y.pick) || 0) - (Math.floor(x.win * 100 / x.pick) || 0));
+            else if (nowStatus == 1) job.sort((x, y) => (Math.floor(y.pick * 100 / data.games) || 0) - (Math.floor(x.pick * 100 / data.games) || 0));
+            else if (nowStatus == 2) job.sort((x, y) => y.win - x.win);
+            else if (nowStatus == 3) job.sort((x, y) => y.lose - x.lose);
+            else if (nowStatus == 4) job.sort((x, y) => y.pick - x.pick);
+            
+            if (nowStatus == 0) userSkill.sort((x, y) => (Math.floor(y.win * 100 / y.pick) || 0) - (Math.floor(x.win * 100 / x.pick) || 0));
+            else if (nowStatus == 1) userSkill.sort((x, y) => (Math.floor(y.pick * 100 / data.games) || 0) - (Math.floor(x.pick * 100 / data.games) || 0));
+            else if (nowStatus == 2) userSkill.sort((x, y) => y.win - x.win);
+            else if (nowStatus == 3) userSkill.sort((x, y) => y.lose - x.lose);
+            else if (nowStatus == 4) userSkill.sort((x, y) => y.pick - x.pick);
+            
+            console.log(job);
+            
+            job.forEach((e, i) => {
+                const div = document.createElement('div');
+                const thisData = allData.data;
+
+                div.innerHTML = `<h1>${thisData.job[e.id].name}</h1>
+                    <p>승률: ${ Math.floor(e.win * 100 / e.pick) || 0}% (승: ${ e.win } | 패: ${ e.lose } ) | 선택: ${ e.pick } (${Math.floor((e.pick * 100) / (data.games * 2))}%)</p>
+                `
+
+                jobSt.push(div);
+            });
+
+            jobSt.forEach(e => {
+                main.appendChild(e);
+            })
+
+            main.innerHTML += '<hr />'
+
+            userSkill.forEach((e, i) => {
+                const div = document.createElement('div');
+                const thisData = allData.data;
+
+                div.innerHTML = `<h1>${thisData.userSkill[e.id].name}</h1>
+                    <p>승률: ${ Math.floor(e.win * 100 / e.pick) || 0}% (승: ${ e.win } | 패: ${ e.lose } ) | 선택: ${ e.pick } (${Math.floor((e.pick * 100) / (data.games * 2))}%)</p>
+                `
+
+                userSkillSt.push(div);
+            });
+
+            userSkillSt.forEach(e => {
+                main.appendChild(e);
+            })
+        }
+
+    </script>
+</body>
+</html>

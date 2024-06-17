@@ -1,8 +1,14 @@
 const resultParams = new URLSearchParams(window.location.search);
 const resultH3: HTMLHeadingElement = document.querySelector('h3');
 const homeBtn: HTMLDivElement = document.querySelector('#go-home');
+const resultSocket = new WebSocket("ws://kimchi-game.kro.kr:8000");
+
 const result: string = resultParams.get("result");
-const resultSocket = new WebSocket("ws://10.7.152.216:8000");
+const resultJob = resultParams.get("job");
+const resultUserSkill = resultParams.get("userskill");
+
+console.log(resultJob, resultUserSkill, result)
+fetch(`http://kimchi-game.kro.kr:1972/statistics/gameover?job=${ resultJob }&userskill=${ resultUserSkill }&result=${ result }`);
 
 if (result == 'lose') {
     resultH3.innerHTML = "패배";

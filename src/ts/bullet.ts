@@ -63,7 +63,7 @@ class Bullet {
         }
 
         if (this.damage == 0) {
-            _bullet.style.opacity = `30%`;
+            _bullet.style.opacity = `20%`;
             _bullet.style.backgroundColor = `black`;
         }
         
@@ -82,12 +82,13 @@ class Bullet {
 
         const interval = setInterval(() => {
             this._movedDistance += this.speed;
+            
             const bulletX = parseFloat(_bullet.style.left);
             const bulletY = parseFloat(_bullet.style.top);
 
             const newX = bulletX - this.speed * Math.cos(this.degree);
             const newY = bulletY - this.speed * Math.sin(this.degree);
-            
+
             _bullet.style.left = `${newX}px`;
             _bullet.style.top = `${newY}px`;
 
@@ -95,11 +96,26 @@ class Bullet {
             this.pos.y = newY;
 
             if (type == "enemy") {
-                if (Math.abs(this.pos.x - position.p.x - 12) <= 27 && Math.abs(this.pos.y - position.p.y - 12) <= 27 && !this.isColid) {
-                    hp.p -= this.damage;
-                    this.isColid = true;
+                // if (Math.abs(this.pos.x - position.p.x - 12) <= 27 && Math.abs(this.pos.y - position.p.y - 12) <= 27 && !this.isColid) {
+                if (Math.abs(newX - position.p.x - 10) <= 30 && Math.abs(newY - position.p.y - 10) <= 30 && !this.isColid) {
+                    //                             ^^ 있는 이유: 총알의 반지름
+                    if (job == 0 && keyDown.jobSkill2.isSkillOn) {
+                        hp.p -= Math.floor(this.damage * (skillData[1].extraData * 0.01));
+                    } else {
+                        hp.p -= this.damage;
+                    }
 
-                    console.log(this.dmgToHeal);
+                    if (enemyJob == 1) {
+                        moveSpeed = allSkillData[1][1].moveSpd;
+
+                        setTimeout(() => {
+                            moveSpeed = 8;
+                        }, allSkillData[1][1].skillDuration * 10)
+                    }
+
+                    this.isColid = true;
+                    this.isArrive = false;
+
                     if (this.dmgToHeal) {
                         socket.send(`{"message":"dmgToHeal"}`);
                     }
